@@ -71,14 +71,14 @@ public class Inicio extends AppCompatActivity {
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
-        final TextView mdispositivos = (TextView) findViewById(R.id.textView);
+
 
         final StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>(){
                     @Override
                     public void onResponse(String response) {
                         // Display the first 500 characters of the response string.
-                        addToHistory(response);
+
                         try {
                         JSONArray Jdispositivos = new JSONArray(response);
                             ArrayList<Dispositivo> dispositivos = new ArrayList<Dispositivo>();
@@ -93,6 +93,26 @@ public class Inicio extends AppCompatActivity {
                                 d.setUbicacion(c.getString("ubicacion"));
 
                                 dispositivos.add(d);
+                             /*   ImageButton dispositivo = new ImageButton(getApplicationContext());
+                                dispositivo.setContentDescription(ubicacion);
+                                switch (tipo){
+                                    case "outlet":
+                                        switch (estado){
+                                            case "1":
+                                                dispositivo.setBackgroundResource(R.drawable.outletprendido);
+                                                break;
+                                            case "2":
+                                                dispositivo.setBackgroundResource(R.drawable.outletapagado);
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                        break;
+                                    default:
+                                        break;
+                                }
+                               */
+
                             }
                             DispositivosAdapter dispositivosAdapter =  new DispositivosAdapter(getApplicationContext(), dispositivos);
                             listaDispositivos.setAdapter(dispositivosAdapter);
@@ -110,15 +130,16 @@ public class Inicio extends AppCompatActivity {
                             });
 
                         }
-                        mdispositivos.setText("Response is: "+ response);
+
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                mdispositivos.setText("That didn't work!" + error);
+
+
             }
         });
-
+        queue.add(stringRequest);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

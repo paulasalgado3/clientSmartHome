@@ -2,6 +2,7 @@ package paula.smarthome;
 
 import android.content.Context;
 import android.media.Image;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -40,16 +41,27 @@ public class DispositivosAdapter extends BaseAdapter {
 
 
     public View getView(int position, View convertView, ViewGroup parent) {
+        final Dispositivo dispositivo = dispositivos.get(position);
 
+        if (convertView == null) {
+            final LayoutInflater layoutInflater = LayoutInflater.from(mContext);
+            convertView = layoutInflater.inflate(R.layout.layout_dispositivos, null);
+        }
+        System.out.println("estado" + dispositivo.getEstado());
+        System.out.println("id" + dispositivo.getId());
 
-        TextView dummyTextView = new TextView(mContext);
-        //dummyTextView.setText(String.valueOf(position));
-        try{
-            dummyTextView.setText(dispositivos.get(position).getId());
+        final TextView ubicacionTextView = (TextView)convertView.findViewById(R.id.textview_ubicacion);
+        final TextView idTextView = (TextView)convertView.findViewById(R.id.textview_id);
+        final ImageView outlet = (ImageView)convertView.findViewById(R.id.outlet);
+        ubicacionTextView.setText(dispositivo.getUbicacion());
+        idTextView.setText(dispositivo.getId().toString());
+        if(dispositivo.getEstado()==1){
+            outlet.setImageResource(R.drawable.outletprendido);
+        }else if(dispositivo.getEstado()==0){
+            outlet.setImageResource(R.drawable.outletapagado);
+        }
 
-        System.out.println("position: " + position + "id: "+ dispositivos.get(position).getId());
-        }catch (final Exception e){}
-        return dummyTextView;
+        return convertView;
     }
 
 
