@@ -1,6 +1,7 @@
 package paula.smarthome;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -9,7 +10,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.android.volley.Request;
@@ -29,6 +33,17 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONException;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 
 public class Inicio extends AppCompatActivity {
@@ -64,6 +79,37 @@ public class Inicio extends AppCompatActivity {
                     public void onResponse(String response) {
                         // Display the first 500 characters of the response string.
                         addToHistory(response);
+                        try {
+                        JSONArray Jdispositivos = new JSONArray(response);
+                            ArrayList<Dispositivo> dispositivos = new ArrayList<Dispositivo>();
+                            GridView listaDispositivos = (GridView) findViewById(R.id.listaDispositivos);
+                            for (int i = 0; i < Jdispositivos.length(); i++) {
+
+                                JSONObject c = Jdispositivos.getJSONObject(i);
+                                Dispositivo d = new Dispositivo();
+                                d.setId(c.getString("id"));
+                                d.setTipo(c.getString("tipo"));
+                                d.setEstado(Integer.parseInt(c.getString("estado")));
+                                d.setUbicacion(c.getString("ubicacion"));
+
+                                dispositivos.add(d);
+                            }
+                            DispositivosAdapter dispositivosAdapter =  new DispositivosAdapter(getApplicationContext(), dispositivos);
+                            listaDispositivos.setAdapter(dispositivosAdapter);
+
+                        } catch (final JSONException e) {
+                            Log.e(TAG, "Json parsing error: " + e.getMessage());
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getApplicationContext(),
+                                            "Json parsing error: " + e.getMessage(),
+                                            Toast.LENGTH_LONG)
+                                            .show();
+                                }
+                            });
+
+                        }
                         mdispositivos.setText("Response is: "+ response);
                     }
                 }, new Response.ErrorListener() {
