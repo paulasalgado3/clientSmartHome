@@ -7,15 +7,15 @@ package paula.smarthome;
 public class Dispositivo {
     private String id;
     private String tipo;
-    private int estado;
+    private Boolean estado;
     private String ubicacion;
 
-    public void Dispositivo(String id, String tipo, int estado){
+    public void Dispositivo(String id, String tipo, Boolean estado){
         this.id = id;
         this.tipo = tipo;
         this.estado = estado;
     }
-    public void Dispositivo(String id, String tipo, int estado, String ubicacion){
+    public void Dispositivo(String id, String tipo, Boolean estado, String ubicacion){
         this.id = id;
         this.tipo = tipo;
         this.estado = estado;
@@ -26,7 +26,7 @@ public class Dispositivo {
         this.ubicacion = ubicacion;
     }
 
-    public void setEstado(int estado) {
+    public void setEstado(Boolean estado) {
 
         this.estado = estado;
     }
@@ -41,7 +41,7 @@ public class Dispositivo {
         this.id = id;
     }
 
-    public int getEstado() {
+    public Boolean getEstado() {
 
         return estado;
     }

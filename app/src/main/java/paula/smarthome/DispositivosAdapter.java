@@ -55,9 +55,9 @@ public class DispositivosAdapter extends BaseAdapter {
         final ImageView outlet = (ImageView)convertView.findViewById(R.id.outlet);
         ubicacionTextView.setText(dispositivo.getUbicacion());
         idTextView.setText(dispositivo.getId().toString());
-        if(dispositivo.getEstado()==1){
+        if(dispositivo.getEstado()==true){
             outlet.setImageResource(R.drawable.outletprendido);
-        }else if(dispositivo.getEstado()==0){
+        }else if(dispositivo.getEstado()==false){
             outlet.setImageResource(R.drawable.outletapagado);
         }
 

@@ -22,6 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
+        app:backgroundTint="@android:color/holo_green_dark"
         app:srcCompat="@android:drawable/ic_dialog_email" />
 
     <android.support.v7.widget.Toolbar
@@ -33,7 +34,7 @@
 
     <GridView
         android:id="@+id/listaDispositivos"
-        android:layout_width="367dp"
+        android:layout_width="354dp"
         android:layout_height="390dp"
         android:layout_marginTop="60dp"
         android:columnWidth="100dp"

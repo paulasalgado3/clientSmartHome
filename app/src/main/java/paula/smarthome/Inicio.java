@@ -1,7 +1,6 @@
 package paula.smarthome;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -10,9 +9,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -22,6 +20,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -29,21 +28,15 @@ import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttClient;
-
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+
+
 
 
 public class Inicio extends AppCompatActivity {
@@ -63,6 +56,8 @@ public class Inicio extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        final Gson gson = new Gson();
         final RequestQueue queue = Volley.newRequestQueue(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inicio);
@@ -72,7 +67,9 @@ public class Inicio extends AppCompatActivity {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
 
-
+        final ArrayList<Dispositivo> dispositivos = new ArrayList<Dispositivo>();
+        final GridView listaDispositivos = (GridView) findViewById(R.id.listaDispositivos);
+        final DispositivosAdapter dispositivosAdapter = new DispositivosAdapter(getApplicationContext(), dispositivos);
         final StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>(){
                     @Override
@@ -81,40 +78,18 @@ public class Inicio extends AppCompatActivity {
 
                         try {
                         JSONArray Jdispositivos = new JSONArray(response);
-                            ArrayList<Dispositivo> dispositivos = new ArrayList<Dispositivo>();
-                            GridView listaDispositivos = (GridView) findViewById(R.id.listaDispositivos);
+
                             for (int i = 0; i < Jdispositivos.length(); i++) {
 
                                 JSONObject c = Jdispositivos.getJSONObject(i);
                                 Dispositivo d = new Dispositivo();
                                 d.setId(c.getString("id"));
                                 d.setTipo(c.getString("tipo"));
-                                d.setEstado(Integer.parseInt(c.getString("estado")));
+                                d.setEstado(Boolean.valueOf((c.getString("estado"))));
                                 d.setUbicacion(c.getString("ubicacion"));
 
                                 dispositivos.add(d);
-                             /*   ImageButton dispositivo = new ImageButton(getApplicationContext());
-                                dispositivo.setContentDescription(ubicacion);
-                                switch (tipo){
-                                    case "outlet":
-                                        switch (estado){
-                                            case "1":
-                                                dispositivo.setBackgroundResource(R.drawable.outletprendido);
-                                                break;
-                                            case "2":
-                                                dispositivo.setBackgroundResource(R.drawable.outletapagado);
-                                                break;
-                                            default:
-                                                break;
-                                        }
-                                        break;
-                                    default:
-                                        break;
-                                }
-                               */
-
                             }
-                            DispositivosAdapter dispositivosAdapter =  new DispositivosAdapter(getApplicationContext(), dispositivos);
                             listaDispositivos.setAdapter(dispositivosAdapter);
 
                         } catch (final JSONException e) {
@@ -170,10 +145,11 @@ public class Inicio extends AppCompatActivity {
                    if (reconnect) {
                        addToHistory("Reconnected to : " + serverURI);
                        // Because Clean Session is true, we need to re-subscribe
-                       subscribeToTopic();
+                       //subscribeToTopic("home/features/outlet/change_state",1);
                    } else {
                        addToHistory("Connected to: " + serverURI);
-                       subscribeToTopic();
+                       //subscribeToTopic("home/features/outlet/change_state",1);
+                       //subscribeToTopic();
                    }
                }
 
@@ -184,6 +160,15 @@ public class Inicio extends AppCompatActivity {
 
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
+                /*
+                switch(topic){
+                    case "home/features/outlet/change_state":
+
+                        break;
+                    default:
+                        break;
+                }
+                  */
                 addToHistory("Incoming message: " + new String(message.getPayload()));
             }
 
@@ -215,6 +200,17 @@ public class Inicio extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        listaDispositivos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView parent, View view, int position, long id) {
+                Dispositivo dispositivo = dispositivos.get(position);
+                dispositivo.setEstado(!dispositivo.getEstado());
+                String json = gson.toJson(dispositivo);
+                publishMessage(json,"home/features/outlet/change_state");
+                dispositivosAdapter.notifyDataSetChanged();
+            }
+        });
+
     }
 
 
@@ -224,12 +220,12 @@ public class Inicio extends AppCompatActivity {
                 .setAction("Action", null).show();
     }
 
-    String subscriptionTopic = "home";
-    int qos = 1;
-    public void subscribeToTopic(){
+    //String subscriptionTopic = "home";
+    //int qos = 1;
+    public void subscribeToTopic(String topic, int qos){
 
     try {
-        IMqttToken subToken = client.subscribe(subscriptionTopic, qos);
+        IMqttToken subToken = client.subscribe(topic, qos);
         subToken.setActionCallback(new IMqttActionListener() {
             @Override
             public void onSuccess(IMqttToken asyncActionToken) {
@@ -249,16 +245,17 @@ public class Inicio extends AppCompatActivity {
         e.printStackTrace();
     }
 
+
     }
 
-    final String publishTopic = "exampleAndroidPublishTopic";
-    final String publishMessage = "Hello World!";
-    public void publishMessage(){
+    //final String publishTopic = "exampleAndroidPublishTopic";
+    //final String publishMessage = "Hello World!";
+    public void publishMessage(String mensaje, String topic){
 
         try {
             MqttMessage message = new MqttMessage();
-            message.setPayload(publishMessage.getBytes());
-            client.publish(publishTopic, message);
+            message.setPayload(mensaje.getBytes());
+            client.publish(topic, message);
             addToHistory("Message Published");
             if(!client.isConnected()){
                 addToHistory(client.getBufferedMessageCount() + " messages in buffer.");
@@ -286,7 +283,9 @@ public class Inicio extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            System.out.println("Se seleccionó opciones");
             return true;
+
         }
 
         return super.onOptionsItemSelected(item);
