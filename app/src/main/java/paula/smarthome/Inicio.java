@@ -41,7 +41,7 @@ import java.util.ArrayList;
 
 public class Inicio extends AppCompatActivity {
     private final String TAG = "a";
-    private final String serverUri = "tcp://10.105.231.63:1883";
+    private final String serverUri = "tcp://200.5.235.62:1883";
 
     private MqttConnectOptions options = new MqttConnectOptions();
     MqttAndroidClient client ;
@@ -49,7 +49,7 @@ public class Inicio extends AppCompatActivity {
 
 
     // Instantiate the RequestQueue.
-    String url ="http://10.105.231.63:8080/dispositivos";
+    String url ="http://200.5.235.62:8080/dispositivos";
     // Request a string response from the provided URL.
 
 
@@ -206,7 +206,7 @@ public class Inicio extends AppCompatActivity {
                 Dispositivo dispositivo = dispositivos.get(position);
                 dispositivo.setEstado(!dispositivo.getEstado());
                 String json = gson.toJson(dispositivo);
-                publishMessage(json,"home/features/outlet/change_state");
+                publishMessage(json,"home/feature/outlet/change_state");
                 dispositivosAdapter.notifyDataSetChanged();
             }
         });
