@@ -52,7 +52,7 @@ public class Inicio extends AppCompatActivity {
     String url ="http://200.5.235.62:8080/dispositivos";
     // Request a string response from the provided URL.
 
-
+    //comentario 01
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
