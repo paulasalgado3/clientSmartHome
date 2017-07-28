@@ -87,6 +87,7 @@ public class Inicio extends AppCompatActivity {
                                 d.setTipo(c.getString("tipo"));
                                 d.setEstado(Boolean.valueOf((c.getString("estado"))));
                                 d.setUbicacion(c.getString("ubicacion"));
+                                d.setPosicion(c.getString("posicion"));
 
                                 dispositivos.add(d);
                             }
